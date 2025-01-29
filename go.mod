@@ -1,3 +1,3 @@
-module github.com/romainaugier/ini_config_parser
+module github.com/romainaugier/go-config-parser
 
 go 1.20

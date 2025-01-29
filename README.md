@@ -1,9 +1,9 @@
 # ini_config_parser
 Simple and easy to use .ini config parser written in Go
 
-![BuildTest](https://github.com/romainaugier/ini_config_parser/actions/workflows/build_and_test.yml/badge.svg)
+![BuildTest](https://github.com/romainaugier/go-config-parser/actions/workflows/build_and_test.yml/badge.svg)
 
-`go install github.com/romainaugier/ini_config_parser@latest`
+`go install github.com/romainaugier/go-config-parser@latest`
 
 API:
 ```go
@@ -11,14 +11,14 @@ package main
 
 import (
     "fmt"
-    icp "github.com/romainaugier/ini_config_parser"
+    cp "github.com/romainaugier/go-config-parser"
 )
 
 func main() {
     config_path := "/path/to/config.ini"
 
     // Parses the configuration
-    config := icp.IniConfigParse(config_path)
+    config := cp.IniConfigParse(config_path)
 
     // Config will be nil if there was an error during parsing
     if config == nil {
@@ -28,14 +28,14 @@ func main() {
 
     // Gets a key value as string. By default, all values are stored as strings. If the key is not present,
     // returns an empty one
-    string_key := icp.IniConfigGet(config, "Global", "STRING_KEY")
+    string_key := cp.IniConfigGet(config, "Global", "STRING_KEY")
 
     // Gets a key value as int. If there was an error during the conversion string->int, returns the
     // default value
-    int_key := icp.IniConfigGetInt(config, "Global", "INT_KEY", 0)
+    int_key := cp.IniConfigGetInt(config, "Global", "INT_KEY", 0)
 
     // Gets a key value as bool. If there was an error during the conversion string->bool, returns the
     // default value
-    bool_key := icp.IniConfigGetBool(config, "Global", "BOOL_KEY", false)
+    bool_key := cp.IniConfigGetBool(config, "Global", "BOOL_KEY", false)
 }
 ```

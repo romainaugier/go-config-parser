@@ -1,4 +1,4 @@
-package ini_config_parser
+package config_parser
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type IniConfig struct {
+type Config struct {
 	Path    string
 	Content map[string]string
 }
@@ -21,15 +21,15 @@ const (
 	IniTokenType_Comment = iota
 )
 
-type IniToken struct {
+type Token struct {
 	Data string
 	Type int
 }
 
 var is_alnum = regexp.MustCompile(`[a-zA-Z0-9]`).MatchString
 
-func ini_lex(file_content string) ([]IniToken, bool) {
-	tokens := []IniToken{}
+func ini_lex(file_content string) ([]Token, bool) {
+	tokens := []Token{}
 
 	s := file_content
 
@@ -49,7 +49,7 @@ func ini_lex(file_content string) ([]IniToken, bool) {
 				}
 			}
 
-			tokens = append(tokens, IniToken{file_content[start_index : start_index+size-1], IniTokenType_Section})
+			tokens = append(tokens, Token{file_content[start_index : start_index+size-1], IniTokenType_Section})
 
 			i++
 		} else if is_alnum(string(s[i])) {
@@ -69,7 +69,7 @@ func ini_lex(file_content string) ([]IniToken, bool) {
 				}
 			}
 
-			tokens = append(tokens, IniToken{file_content[key_start : key_start+key_size], IniTokenType_Key})
+			tokens = append(tokens, Token{file_content[key_start : key_start+key_size], IniTokenType_Key})
 
 			i++
 
@@ -85,7 +85,7 @@ func ini_lex(file_content string) ([]IniToken, bool) {
 				value_size++
 			}
 
-			tokens = append(tokens, IniToken{file_content[value_start : value_start+value_size], IniTokenType_Value})
+			tokens = append(tokens, Token{file_content[value_start : value_start+value_size], IniTokenType_Value})
 		} else if s[i] == ';' {
 			for s[i] != '\n' && s[i] != '\r' && s[i] != '\t' && i < len(s) {
 				i++
@@ -96,7 +96,7 @@ func ini_lex(file_content string) ([]IniToken, bool) {
 	return tokens, true
 }
 
-func ini_parse(tokens []IniToken) map[string]string {
+func ini_parse(tokens []Token) map[string]string {
 	contents := make(map[string]string)
 
 	current_section := "Default"
@@ -124,7 +124,7 @@ func check_error(e error) {
 	}
 }
 
-func IniConfigParse(file_path string) *IniConfig {
+func ConfigParse(file_path string) *Config {
 	if _, err := os.Stat(file_path); errors.Is(err, os.ErrNotExist) {
 		fmt.Printf("[Error] : IniConfigParse can't find ini config file path: \"%s\"\n", file_path)
 		return nil
@@ -143,13 +143,13 @@ func IniConfigParse(file_path string) *IniConfig {
 
 	contents := ini_parse(tokens)
 
-	config := IniConfig{file_path, contents}
+	config := Config{file_path, contents}
 
 	return &config
 }
 
 // Returns a ini config value, as string
-func IniConfigGet(config *IniConfig, config_section string, config_key string) string {
+func ConfigGet(config *Config, config_section string, config_key string) string {
 	key := fmt.Sprintf("%s___%s", config_section, config_key)
 
 	data := config.Content[key]
@@ -162,8 +162,8 @@ func IniConfigGet(config *IniConfig, config_section string, config_key string) s
 }
 
 // Returns a ini config value as int. If the value cannot be converted to int, returns default value
-func IniConfigGetInt(config *IniConfig, config_section string, config_key string, default_value int) int {
-	string_value := IniConfigGet(config, config_section, config_key)
+func ConfigGetInt(config *Config, config_section string, config_key string, default_value int) int {
+	string_value := ConfigGet(config, config_section, config_key)
 
 	value, err := strconv.Atoi(string_value)
 
@@ -175,8 +175,8 @@ func IniConfigGetInt(config *IniConfig, config_section string, config_key string
 }
 
 // Returns a ini config value as bool. If the value cannot be converted to bool, returns false
-func IniConfigGetBool(config *IniConfig, config_section string, config_key string, default_value bool) bool {
-	string_value := IniConfigGet(config, config_section, config_key)
+func ConfigGetBool(config *Config, config_section string, config_key string, default_value bool) bool {
+	string_value := ConfigGet(config, config_section, config_key)
 
 	value, err := strconv.ParseBool(string_value)
 
